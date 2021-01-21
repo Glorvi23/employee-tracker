@@ -34,14 +34,8 @@ function init() {
 
             if (answer.selection === "View All Employees") {
                 viewAllEmployees();
-                //             } else if (answer.selection === "View All Employees By Department") {
-                //                  //last
-                //             } else if (answer.selection === "View All Employees By Manager") {
-                //                  //last
             } else if (answer.selection === "Add Employee") {
                 addEmployee();
-                // } else if (answer.selection === "Remove Employee") {
-                //     //last
             } else if (answer.selection === "Update Employee Role") {
                 updateEmployeeRole();
                 // } else if (answer.selection === "Update Employee Manager") {
@@ -65,7 +59,7 @@ function init() {
 function viewAllEmployees() {
     connection.query(
         "SELECT * FROM employee",
-        function (err) {
+        (err, data) => {
             if (err) throw err;
             console.table(data);
             console.log("All employees logged successfully!");
@@ -73,3 +67,4 @@ function viewAllEmployees() {
         }
     );
 }
+
