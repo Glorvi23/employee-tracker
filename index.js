@@ -68,3 +68,34 @@ function viewAllEmployees() {
     );
 }
 
+function addEmployee() {
+    inquirer
+        .prompt([{
+                name: "firstName",
+                type: "input",
+                message: "What is the employee's first name?",
+            },
+            {
+                name: "lastName",
+                type: "input",
+                message: "What is the employee's last name?",
+            }
+        ])
+        .then(function (answer) {
+
+            connection.query(
+                "INSERT INTO employee SET ?", {
+                    first_name: answer.firstName,
+                    last_name: answer.lastName
+                },
+                function (err) {
+                    if (err) throw err;
+                    console.log("All employees logged successfully!");
+                    init();
+                }
+            );
+
+
+        });
+
+}
