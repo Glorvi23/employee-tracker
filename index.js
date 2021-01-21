@@ -62,3 +62,14 @@ function init() {
         });
 }
 
+function viewAllEmployees() {
+    connection.query(
+        "SELECT * FROM employee",
+        function (err) {
+            if (err) throw err;
+            console.table(data);
+            console.log("All employees logged successfully!");
+            init();
+        }
+    );
+}
