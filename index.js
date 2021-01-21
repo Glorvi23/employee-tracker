@@ -10,14 +10,16 @@ var connection = mysql.createConnection({
     user: "root",
 
     password: "mickey19",
-    database: "employeeTracker_DB"
+    database: "companyDB"
 });
 
 connection.connect(function (err) {
     if (err) throw err;
-    init();
+    // init();
+        console.log("string connect to the database");
+
 });
 
 function init(){
-    
+
 }
