@@ -1,6 +1,8 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-var {promisify} = require("util");
+var {
+    promisify
+} = require("util");
 
 
 var connection = mysql.createConnection({
@@ -61,14 +63,20 @@ function init() {
 
 function viewAllEmployees() {
     connection.query(
-        "SELECT * FROM employee",
+        // "SELECT * FROM employee",
+        "SELECT employee.id, CONCAT(last_name, ', ', first_name) AS 'Full Name', role.title AS 'Role Title', employee.manager_id AS Manager FROM employee INNER JOIN role ON employee.role_id = role.id ORDER BY employee.id ASC",
         (err, data) => {
             if (err) throw err;
+            console.log(data);
             console.table(data);
             console.log("All employees logged successfully!");
             init();
         }
     );
+}
+
+async function getEmployees() {
+    return connection.query("SELECT * FROM employee");
 }
 
 async function addEmployee() {
@@ -90,6 +98,7 @@ async function addEmployee() {
             const rolesData = await getRoles();
             const roles = [];
             rolesData.forEach((role) => {
+                console.log(role.title);
                 roles.push(role.title);
             });
 
@@ -108,7 +117,7 @@ async function addEmployee() {
             console.log(chosenRoleObj[0].id);
 
             connection.query(
-                "INSERT INTO employee SET ?", {
+                "INSERT INTO employee SET (?,", {
                     first_name: answer.firstName,
                     last_name: answer.lastName,
                     role_id: chosenRoleObj[0].id
@@ -128,6 +137,10 @@ async function getRoles() {
     return connection.query("SELECT * FROM role");
 }
 
+async function getDepartment() {
+    return connection.query("SELECT * FROM department");
+}
+
 async function addRole() {
     const rolesData = await getRoles();
     const roles = [];
@@ -138,38 +151,64 @@ async function addRole() {
     inquirer
         .prompt([{
             name: "role",
-            type: "list",
-            message: "What is the employee's role?",
-            choices: roles
+            type: "input",
+            message: "What role to you want to add?"
         }])
-        .then(function (answer) {
+        .then(async function (answer) {
+
+            //*************************
+            //**Goes with employee update?????? */
+
+            // const employeeData = await getEmployees();
+            // const employees = [];
+            // employeeData.forEach((emp) =>{
+            //     console.log(emp.first_name);
+            //     employees.push(emp.first_name)
+            // })
+            // console.log(employeeData);
+
+            // connection.query(
+            //     "SELECT * FROM role",
+            //     (err, data) => {
+            //         if (err) throw err;
+            //         console.table(data);
+            //         // role.push(data);
+            //         console.log("All employees logged successfully!");
+            //         init();
+            //     }
+            // );
+
+            const departmentsData = await getDepartment();
+            const departments = [];
+            departmentsData.forEach((department) => {
+                console.log(department.name);
+                departments.push(department.name)
+            })
+            console.log(departmentsData);
+            const {
+                chosenDepartment
+            } = await inquirer
+                .prompt([{
+                    name: "chosenDepartment",
+                    type: "list",
+                    message: "What is the employee's department?",
+                    choices: departments
+                }])
+            const chosenDepartmentObj = departmentsData.filter((department) => {
+                return chosenDepartment === department.name;
+            });
+            console.log(chosenDepartmentObj[0].id);
 
             connection.query(
-                "SELECT * FROM role",
-                (err, data) => {
-                    if (err) throw err;
-                    console.table(data);
-                    role.push(data);
-                    console.log("All employees logged successfully!");
-                    init();
-                }
-            );
-
-            connection.query(
-                "INSERT INTO employee SET ?", {
-                    first_name: answer.firstName,
-                    last_name: answer.lastName
+                "INSERT INTO role SET ?", {
+                    title: answer.role,
+                    salary: 50000,
+                    department_id: chosenDepartmentObj[0].id
                 },
                 function (err) {
                     if (err) throw err;
-                    // let employee = {
-                    //     first_name: answer.firstName,
-                    //     last_name: answer.lastName
-                    // }
-                    // employees.push(employee);
-                    // console.log(employees);
-                    // console.log(employee);
-                    console.log("All employees logged successfully!");
+
+                    console.log("Role logged successfully!");
                     init();
                 }
             );
