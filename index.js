@@ -31,8 +31,8 @@ function init() {
             name: "selection",
             type: "list",
             message: "What would you like to do?",
-            choices: ["View All Employees", "Add Employee", "Update Employee Role", "View All Roles",
-                "Add Role", "View All Departments", "Add Department"
+            choices: ["View All Employees", "View All Departments", "View All Roles", "Add Employee",
+                "Add Role", "Add Department", "Update Employee Role"
             ]
         })
         .then(function (answer) {
@@ -111,6 +111,10 @@ async function getRoles() {
     return connection.query("SELECT * FROM role");
 }
 
+async function getDepartment() {
+    return connection.query("SELECT * FROM department");
+}
+
 async function addEmployee() {
 
     // const {fname, lastname} = await ing prompt
@@ -130,7 +134,7 @@ async function addEmployee() {
             const rolesData = await getRoles();
             const roles = [];
             rolesData.forEach((role) => {
-                console.log(role.title);
+                // console.log(role.title);
                 roles.push(role.title);
             });
 
@@ -146,10 +150,10 @@ async function addEmployee() {
             const chosenRoleObj = rolesData.filter((role) => {
                 return chosenRole === role.title;
             });
-            console.log(chosenRoleObj[0].id);
+            // console.log(chosenRoleObj[0].id);
 
             connection.query(
-                "INSERT INTO employee SET (?,", {
+                "INSERT INTO employee SET ?", {
                     first_name: answer.firstName,
                     last_name: answer.lastName,
                     role_id: chosenRoleObj[0].id
@@ -165,17 +169,13 @@ async function addEmployee() {
 
 }
 
-async function getDepartment() {
-    return connection.query("SELECT * FROM department");
-}
-
 async function addRole() {
     const rolesData = await getRoles();
     const roles = [];
     rolesData.forEach((role) => {
         roles.push(role.title);
     });
-    console.log(rolesData);
+    // console.log(rolesData);
     inquirer
         .prompt([{
             name: "role",
@@ -242,6 +242,8 @@ async function addRole() {
             );
         });
 }
+
+
 
 // function updateEmployeeRole() {
 //     inquirer
