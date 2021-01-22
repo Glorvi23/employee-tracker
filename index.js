@@ -67,7 +67,7 @@ function viewAllEmployees() {
         "SELECT employee.id, CONCAT(last_name, ', ', first_name) AS 'Full Name', role.title AS 'Role Title', employee.manager_id AS Manager FROM employee INNER JOIN role ON employee.role_id = role.id ORDER BY employee.id ASC",
         (err, data) => {
             if (err) throw err;
-            console.log(data);
+            // console.log(data);
             console.table(data);
             console.log("All employees logged successfully!");
             init();
@@ -75,8 +75,40 @@ function viewAllEmployees() {
     );
 }
 
+function viewAllDepartments() {
+    connection.query(
+        // "SELECT * FROM employee",
+        "SELECT name AS Departments FROM department",
+        (err, data) => {
+            if (err) throw err;
+            // console.log(data);
+            console.table(data);
+            console.log("All departments logged successfully!");
+            init();
+        }
+    );
+}
+
+function viewAllRoles() {
+    connection.query(
+        // "SELECT * FROM role",
+        "SELECT title AS Role, salary AS 'Annual Salary', department.name AS Department FROM role INNER JOIN department ON role.department_id = department.id;",
+        (err, data) => {
+            if (err) throw err;
+            // console.log(data);
+            console.table(data);
+            console.log("All roles logged successfully!");
+            init();
+        }
+    );
+}
+
 async function getEmployees() {
     return connection.query("SELECT * FROM employee");
+}
+
+async function getRoles() {
+    return connection.query("SELECT * FROM role");
 }
 
 async function addEmployee() {
@@ -131,10 +163,6 @@ async function addEmployee() {
             );
         });
 
-}
-
-async function getRoles() {
-    return connection.query("SELECT * FROM role");
 }
 
 async function getDepartment() {
