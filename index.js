@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var {promisify} = require("util");
 
 
 var connection = mysql.createConnection({
@@ -19,6 +20,8 @@ connection.connect(function (err) {
     // console.log("string connect to the database");
 
 });
+
+connection.query = promisify(connection.query);
 
 function init() {
     inquirer
@@ -68,7 +71,9 @@ function viewAllEmployees() {
     );
 }
 
-function addEmployee() {
+async function addEmployee() {
+
+    // const {fname, lastname} = await ing prompt
     inquirer
         .prompt([{
                 name: "firstName",
@@ -81,7 +86,74 @@ function addEmployee() {
                 message: "What is the employee's last name?",
             }
         ])
+        .then(async function (answer) {
+            const rolesData = await getRoles();
+            const roles = [];
+            rolesData.forEach((role) => {
+                roles.push(role.title);
+            });
+
+            const {
+                chosenRole
+            } = await inquirer
+                .prompt([{
+                    name: "chosenRole",
+                    type: "list",
+                    message: "What is the employee's role?",
+                    choices: roles
+                }])
+            const chosenRoleObj = rolesData.filter((role) => {
+                return chosenRole === role.title;
+            });
+            console.log(chosenRoleObj[0].id);
+
+            connection.query(
+                "INSERT INTO employee SET ?", {
+                    first_name: answer.firstName,
+                    last_name: answer.lastName,
+                    role_id: chosenRoleObj[0].id
+                },
+                function (err) {
+                    if (err) throw err;
+
+                    console.log("Created new employee successfully!");
+                    init();
+                }
+            );
+        });
+
+}
+
+async function getRoles() {
+    return connection.query("SELECT * FROM role");
+}
+
+async function addRole() {
+    const rolesData = await getRoles();
+    const roles = [];
+    rolesData.forEach((role) => {
+        roles.push(role.title);
+    });
+    console.log(rolesData);
+    inquirer
+        .prompt([{
+            name: "role",
+            type: "list",
+            message: "What is the employee's role?",
+            choices: roles
+        }])
         .then(function (answer) {
+
+            connection.query(
+                "SELECT * FROM role",
+                (err, data) => {
+                    if (err) throw err;
+                    console.table(data);
+                    role.push(data);
+                    console.log("All employees logged successfully!");
+                    init();
+                }
+            );
 
             connection.query(
                 "INSERT INTO employee SET ?", {
@@ -90,12 +162,57 @@ function addEmployee() {
                 },
                 function (err) {
                     if (err) throw err;
+                    // let employee = {
+                    //     first_name: answer.firstName,
+                    //     last_name: answer.lastName
+                    // }
+                    // employees.push(employee);
+                    // console.log(employees);
+                    // console.log(employee);
                     console.log("All employees logged successfully!");
                     init();
                 }
             );
-
-
         });
-
 }
+
+// function updateEmployeeRole() {
+//     inquirer
+//         .prompt({
+//             name: "selection",
+//             type: "list",
+//             message: "Who do you want to update?",
+//             choices: employees
+//         }).then(function (answer) {
+//             inquirer
+//                 .prompt([{
+//                         name: "firstName",
+//                         type: "input",
+//                         message: "What is the employee's first name?",
+//                     },
+//                     {
+//                         name: "lastName",
+//                         type: "input",
+//                         message: "What is the employee's last name?",
+//                     }
+//                 ])
+//                 .then(function (answer) {
+
+//                     connection.query(
+//                         "INSERT INTO employee SET ?", {
+//                             first_name: answer.firstName,
+//                             last_name: answer.lastName
+//                         },
+//                         function (err) {
+//                             if (err) throw err;
+//                             console.log("All employees logged successfully!");
+//                             init();
+//                         }
+//                     );
+
+
+//                 });
+
+//         });
+
+// }
