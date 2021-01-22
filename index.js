@@ -243,7 +243,27 @@ async function addRole() {
         });
 }
 
+async function addDepartment() {
+    inquirer
+        .prompt([{
+            name: "department",
+            type: "input",
+            message: "What department do you want to add?"
+        }])
+        .then(async function (answer) {
+            connection.query(
+                "INSERT INTO department SET ?", {
+                    name: answer.department
+                },
+                function (err) {
+                    if (err) throw err;
 
+                    console.log("Department logged successfully!");
+                    init();
+                }
+            );
+        });
+}
 
 // function updateEmployeeRole() {
 //     inquirer
