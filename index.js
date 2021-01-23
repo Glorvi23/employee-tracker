@@ -32,7 +32,7 @@ function init() {
             type: "list",
             message: "What would you like to do?",
             choices: ["View All Employees", "View All Departments", "View All Roles", "Add Employee",
-                "Add Role", "Add Department", "Update Employee Role"
+                "Add Role", "Add Department", "Update Employee Role", "EXIT"
             ]
         })
         .then(function (answer) {
@@ -92,7 +92,7 @@ function viewAllDepartments() {
 function viewAllRoles() {
     connection.query(
         // "SELECT * FROM role",
-        "SELECT title AS Role, salary AS 'Annual Salary', department.name AS Department FROM role INNER JOIN department ON role.department_id = department.id;",
+        "SELECT title AS Role, salary AS 'Annual Salary', department.name AS Department FROM role INNER JOIN department ON role.department_id = department.id ORDER BY role.id ASC",
         (err, data) => {
             if (err) throw err;
             // console.log(data);
