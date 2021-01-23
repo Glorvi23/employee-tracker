@@ -265,43 +265,64 @@ async function addDepartment() {
         });
 }
 
-// function updateEmployeeRole() {
-//     inquirer
-//         .prompt({
-//             name: "selection",
-//             type: "list",
-//             message: "Who do you want to update?",
-//             choices: employees
-//         }).then(function (answer) {
-//             inquirer
-//                 .prompt([{
-//                         name: "firstName",
-//                         type: "input",
-//                         message: "What is the employee's first name?",
-//                     },
-//                     {
-//                         name: "lastName",
-//                         type: "input",
-//                         message: "What is the employee's last name?",
-//                     }
-//                 ])
-//                 .then(function (answer) {
+async function updateEmployeeRole() {
+    const employeesData = await getEmployees();
+    // console.log(employeesData);
+    const employees = [];
+    employeesData.forEach((emp) => {
+        employees.push(emp.first_name + " " + emp.last_name);
+    });
+    // console.log(employees);
+    const {
+        chosenEmployee
+    } = await inquirer
+        .prompt([{
+            name: "chosenEmployee",
+            type: "list",
+            message: "Select an employee to update their role: ",
+            choices: employees
+        }])
+    console.log(chosenEmployee);
 
-//                     connection.query(
-//                         "INSERT INTO employee SET ?", {
-//                             first_name: answer.firstName,
-//                             last_name: answer.lastName
-//                         },
-//                         function (err) {
-//                             if (err) throw err;
-//                             console.log("All employees logged successfully!");
-//                             init();
-//                         }
-//                     );
+    const chosenEmployeesObj = employeesData.filter((emp) => {
+        return chosenEmployee === emp.first_name + " " + emp.last_name;
+    });
+    // console.log(chosenEmployeesObj[0].id);
 
+    // .then(async function (answer) {
+    const rolesData = await getRoles();
+    const roles = [];
+    rolesData.forEach((role) => {
+        // console.log(role.title);
+        roles.push(role.title);
+    });
 
-//                 });
+    const {
+        chosenRole
+    } = await inquirer
+        .prompt([{
+            name: "chosenRole",
+            type: "list",
+            message: "What is the employee's role?",
+            choices: roles
+        }])
+    const chosenRoleObj = rolesData.filter((role) => {
+        return chosenRole === role.title;
+    });
+    // console.log(chosenRoleObj[0].id);
 
-//         });
+    connection.query(
+        "UPDATE employee SET role_id = ? WHERE employee.id = ?", [
+            chosenRoleObj[0].id,
+            chosenEmployeesObj[0].id
+        ],
+        function (err) {
+            if (err) throw err;
 
-// }
+            console.log("Created new employee successfully!");
+            init();
+        }
+    );
+    // });
+
+}
