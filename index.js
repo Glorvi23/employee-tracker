@@ -184,35 +184,13 @@ async function addRole() {
         }])
         .then(async function (answer) {
 
-            //*************************
-            //**Goes with employee update?????? */
-
-            // const employeeData = await getEmployees();
-            // const employees = [];
-            // employeeData.forEach((emp) =>{
-            //     console.log(emp.first_name);
-            //     employees.push(emp.first_name)
-            // })
-            // console.log(employeeData);
-
-            // connection.query(
-            //     "SELECT * FROM role",
-            //     (err, data) => {
-            //         if (err) throw err;
-            //         console.table(data);
-            //         // role.push(data);
-            //         console.log("All employees logged successfully!");
-            //         init();
-            //     }
-            // );
-
             const departmentsData = await getDepartment();
             const departments = [];
             departmentsData.forEach((department) => {
                 console.log(department.name);
                 departments.push(department.name)
             })
-            console.log(departmentsData);
+            // console.log(departmentsData);
             const {
                 chosenDepartment
             } = await inquirer
@@ -225,12 +203,26 @@ async function addRole() {
             const chosenDepartmentObj = departmentsData.filter((department) => {
                 return chosenDepartment === department.name;
             });
-            console.log(chosenDepartmentObj[0].id);
+            // console.log(chosenDepartmentObj[0].id);
+
+            const { chosenSalary } = await inquirer
+                .prompt([{
+                    name: "chosenSalary",
+                    type: "input",
+                    message: "What is the employee's salary?"
+                }])
+            // console.log(typeof chosenSalary);
+            // const chosenSalaryObj = rolesData.filter((salary) => {
+            //     return chosenSalary === salary.salary;
+            // });
+
+            // console.log(chosenSalaryObj);
+
 
             connection.query(
                 "INSERT INTO role SET ?", {
                     title: answer.role,
-                    salary: 50000,
+                    salary: chosenSalary,
                     department_id: chosenDepartmentObj[0].id
                 },
                 function (err) {
